@@ -12,8 +12,6 @@ def scrape_all():
     browser = Browser('chrome', **executable_path, headless=True)
 
     news_title, news_paragraph = mars_news(browser)
-    hemisphere_image_urls=hemisphere(browser)
-
 
     # Run all scraping functions and store results in a dictionary
     data = {
@@ -21,7 +19,6 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "hemispheres": hemisphere_image_urls,
         "last_modified": dt.datetime.now()
     }
 
@@ -67,13 +64,6 @@ def featured_image(browser):
     full_image_elem = browser.find_by_tag('button')[1]
     full_image_elem.click()
 
-    # Find the more info button and click that 
-    browser.is_element_present_by_text('more info', wait_time=1)
-
-    # will take our string 'more info' and add link associated with it, then click
-    more_info_elem=browser.links.find_by_partial_text('more info')
-    more_info_elem.click()
-
     # Parse the resulting html with soup
     html = browser.html
     img_soup = soup(html, 'html.parser')
@@ -106,37 +96,6 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
-
-def hemisphere(browser):
-    url='https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
-    browser.visit(url)
-
-
-    hemisphere_image_urls = []
-
-    img_link= browser.find_by_css("a.product-item h3")
-
-    for x in range(len(img_link)):
-        hemisphere={}
-
-        # Find elements going to click link 
-        browser.find_by_css("a.product-item h3")[x].click()
-
-        # Find sample Image link
-        sample_img= browser.find_link_by_text("Sample").first
-        hemisphere['img_url']=sample_img['href']
-
-        # Get hemisphere Title
-        hemisphere['title']=browser.find_by_css("h2.title").text
-
-        #Add Objects to hemisphere_img_urls list
-        hemisphere_image_urls.append(hemisphere)
-
-        # Go Back
-        browser.back()
-    return hemisphere_image_urls
-
-
 
 if __name__ == "__main__":
 
