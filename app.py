@@ -18,7 +18,7 @@ def index():
 def scrape():
    mars = mongo.db.mars
    mars_data = scraping.scrape_all()
-   mars.update_one({}, {"$set":mars_data}, upsert=True)
+   mars.update_one({"news_title": "Mars Landing Successful"}, {"$set":mars_data}, upsert=True)
    return redirect('/', code=302)
 
 #code we need for Flask is to tell it to run
