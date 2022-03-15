@@ -108,7 +108,7 @@ def mars_facts():
 ## > SCRAPE HEMISPHERE <
 
 def hemisphere(browser):
-    url='https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    url='https://marshemispheres.com/'
     browser.visit(url)
 
 
