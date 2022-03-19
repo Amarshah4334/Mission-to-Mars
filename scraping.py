@@ -5,10 +5,14 @@ from splinter import Browser
 from bs4 import BeautifulSoup as soup
 import pandas as pd 
 import datetime as dt 
+from webdriver_manager.chrome import ChromeDriverManager
 
 def scrape_all():
     # Initiate headless driver
-    browser = Browser("chrome", executable_path="chromedriver", headless=True)
+   # browser = Browser("chrome", executable_path="chromedriver", headless=True)
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=True)
+
 
     # Since these are pairs 
     news_title, news_paragraph= mars_news(browser)
@@ -22,7 +26,7 @@ def scrape_all():
         "hemispheres": hemisphere_image_urls,
         "last_modified": dt.datetime.now()
     }
-
+    print (data)
     # Stop webdriver and return data
     browser.quit()
     return data
@@ -116,27 +120,28 @@ def hemisphere(browser):
 
     imgs_links= browser.find_by_css("a.product-item h3")
 
-    for x in range(len(imgs_links)):
-        hemisphere={}
+        # 2. Create a list to hold the images and titles.
+    hemisphere_image_urls = []
 
-        # Find elements going to click link 
-        browser.find_by_css("a.product-item h3")[x].click()
-
-        # Find sample Image link
-        sample_img= browser.find_link_by_text("Sample").first
-        hemisphere['img_url']=sample_img['href']
-
-        # Get hemisphere Title
-        hemisphere['title']=browser.find_by_css("h2.title").text
-
-        #Add Objects to hemisphere_img_urls list
-        hemisphere_image_urls.append(hemisphere)
-
-        # Go Back
+    # 3. Write code to retrieve the image urls and titles for each hemisphere.
+    #write code to retrieve the full-resolution image URL and title for each hemisphere image. The full-resolution image will have the .jpg extension.
+    for i in range(4):
+    #create a list to hold the .jpg image URL string and title for each hemisphere imagey
+        hemispheres = {}
+        browser.find_by_css('a.product-item h3')[i].click()
+        element = browser.find_link_by_text('Sample').first
+    #Loop through the full-resolution image URL, click the link, find the Sample image anchor tag, and get the href
+        img_url = element['href']
+        title = browser.find_by_css("h2.title").text
+    #Save the full-resolution image URL string as the value for the img_url key that will be stored in the dictionary
+    #Save the hemisphere image title as the value for the title key that will be stored in the dictionary
+        hemispheres["img_url"] = img_url
+        hemispheres["title"] = title
+    #Before getting the next image URL and title, add the dictionary with the image URL string and the hemisphere image title to the list you created in Step 2.
+        hemisphere_image_urls.append(hemispheres)
         browser.back()
-    return hemisphere_image_urls
+    return (hemisphere_image_urls)
 
 if __name__== "__main__":
     # If running as script, print scrapped data
-    print(scrape_all())
-
+    scrape_all()
